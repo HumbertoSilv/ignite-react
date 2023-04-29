@@ -4,7 +4,7 @@ import styles from "./Header.module.css"
 export const Header = () => {
     return (
         <header className={styles.header}>
-            <img src={igniteLogo} alt="Ignite logo"/>
+            <img src={igniteLogo} alt="Ignite logo" />
             <h1>Ignite Feed</h1>
         </header>
     )

@@ -6,22 +6,44 @@ import { Avatar } from "../Avatar";
 import { Comment } from "../Comment";
 import styles from "./Post.module.css";
 
-export const Post = ({ author, publishedAt, content }) => {
-  const [comment, setComment] = useState([]);
+interface Author {
+  name: string;
+  role: string;
+  avatarUrl: string;
+}
+
+interface Content {
+  type: "paragraph" | "link" | "hashtag";
+  content: string;
+}
+
+export interface PostType {
+  id: number;
+  author: Author;
+  publishedAt: Date;
+  content: Content[];
+}
+
+interface PostProps {
+  post: PostType
+}
+
+export const Post = ({ post }: PostProps) => {
+  const [comment, setComment] = useState<string[]>([]);
   const [newCommentText, setNewCommentText] = useState("");
 
   const isNewCommentEmpty = !newCommentText.trim().length;
 
   // "d 'de' LLLL 'às' HH:mm'h'" => de acordo com a documentação
   const publishedDateFormatted = format(
-    publishedAt,
+    post.publishedAt,
     "d 'de' LLLL 'às' HH:mm'h'",
     {
       locale: ptBr,
     }
   );
 
-  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+  const publishedDateRelativeToNow = formatDistanceToNow(post.publishedAt, {
     locale: ptBr,
     addSuffix: true,
   });
@@ -36,7 +58,7 @@ export const Post = ({ author, publishedAt, content }) => {
     setNewCommentText(event.target.value);
   };
 
-  const deleteComment = (commentToDelete) => {
+  const deleteComment = (commentToDelete: string) => {
     const commentsWithoutDeleteOne = comment.filter(
       (comment) => comment !== commentToDelete
     );
@@ -47,26 +69,26 @@ export const Post = ({ author, publishedAt, content }) => {
     <article className={styles.post}>
       <header>
         <div className={styles.author}>
-          <Avatar src={author.avatarUrl} />
+          <Avatar src={post.author.avatarUrl} />
           <div className={styles.authorInfo}>
-            <strong>{author.name}</strong>
-            <span>{author.role}</span>
+            <strong>{post.author.name}</strong>
+            <span>{post.author.role}</span>
           </div>
         </div>
         <time
           title={publishedDateFormatted}
-          dateTime={publishedAt.toISOString()}
+          dateTime={post.publishedAt.toISOString()}
         >
           {publishedDateRelativeToNow}
         </time>
       </header>
 
       <div className={styles.content}>
-        {content.map((line, index) => {
+        {post.content.map((line, index) => {
           return line.type === "paragraph" && <p key={index}>{line.content}</p>;
         })}
 
-        {content.map((line, index) => {
+        {post.content.map((line, index) => {
           return (
             line.type === "link" && (
               <p key={index}>
@@ -76,7 +98,7 @@ export const Post = ({ author, publishedAt, content }) => {
           );
         })}
 
-        {content.map((line, index) => {
+        {post.content.map((line, index) => {
           return (
             line.type === "hashtag" && (
               <span key={index}>
